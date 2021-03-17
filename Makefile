@@ -1,5 +1,5 @@
 run:
-	go run main.go
+	go run ./cmd/main.go
 
 build-image:
 	docker build -t telegram-bot:v0 .

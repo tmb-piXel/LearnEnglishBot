@@ -1,4 +1,4 @@
-package main
+package telegram
 
 // This is dictionary for learning English Words
 
@@ -14,12 +14,8 @@ import (
 const token = `1653360099:AAEidSka74r1KJtq9nzgpoZFEfeZbnfeyvQ`
 const dictionaryFile = `dictionary`
 
-func main() {
-	runBot()
-}
-
-// Run telegram bot
-func runBot() {
+//StartBot - Run telegram bot
+func StartBot() {
 	bot := createBot()
 	updates := getUpdates(bot)
 	dictionary := readDictionary()
