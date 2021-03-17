@@ -3,22 +3,20 @@ package telegram
 // This is dictionary for learning English Words
 
 import (
-	"bufio"
 	"log"
-	"os"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/storage"
 )
 
 const token = `1653360099:AAEidSka74r1KJtq9nzgpoZFEfeZbnfeyvQ`
-const dictionaryFile = `dictionary`
 
 //StartBot - Run telegram bot
 func StartBot() {
 	bot := createBot()
 	updates := getUpdates(bot)
-	dictionary := readDictionary()
+	dictionary := storage.ReadDictionary()
 	for update := range updates {
 		if update.Message == nil {
 			continue
@@ -94,29 +92,4 @@ func getUpdates(bot *tgbotapi.BotAPI) (updates tgbotapi.UpdatesChannel) {
 	}
 
 	return updates
-}
-
-// Read file with dictionary
-func readDictionary() (dictionary map[string]string) {
-	file, err := os.Open(dictionaryFile)
-
-	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
-	}
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	dictionary = make(map[string]string)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		words := strings.Split(line, "-")
-		englishWord := string(words[0])
-		russianWord := string(words[1])
-		dictionary[englishWord] = russianWord
-	}
-
-	file.Close()
-
-	return dictionary
 }

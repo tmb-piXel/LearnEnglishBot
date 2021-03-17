@@ -1,14 +1,17 @@
 run:
-	go run ./cmd/main.go
+	go run ./cmd/bot/main.go
 
 build-image:
-	docker build -t telegram-bot:v0 .
+	docker build -t pixel68tmb/telegram_bot:latest
 
 start-container:
-	docker run --rm -iddot --name telegram-bot telegram-bot:v0
+	docker run --rm -idt --name telegram_bot pixel68tmb/telegram_bot:latest
 
-delete-all-images:
-	docker rmi $(docker images -aq)
+delete-unused-images:
+	docker image prune -fa
 
 delete-all-containers:
-	docker rm $(docker ps -qamake)
+	docker rm $(shell docker ps -qa)
+
+readDictionary:
+	go run ./cmd/dictionary/main.go

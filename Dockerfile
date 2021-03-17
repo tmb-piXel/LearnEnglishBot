@@ -6,7 +6,7 @@ COPY . /github.com/tmb-piXel/telegramBotForLearningEnglish/
 WORKDIR /github.com/tmb-piXel/telegramBotForLearningEnglish/
 
 RUN go mod download
-RUN go build -o ./.bin/bot main.go
+RUN go build -o ./.bin/bot cmd/bot/main.go
 
 FROM alpine:latest
 
