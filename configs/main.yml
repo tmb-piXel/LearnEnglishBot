@@ -1,0 +1,8 @@
+messages:
+  responses:
+    start: "Введите /start"
+    already_start: "Я заработал"
+    unknown_command: "Я не знаю такой команды"
+    correct_answer: "Поздравляю, это правильный ответ"
+    wrong_answer: "Упс, это неправильный ответ"
+    theCorrectAnswerWas: "Правильный ответ был: "

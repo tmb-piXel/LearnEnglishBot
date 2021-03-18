@@ -24,8 +24,8 @@ func ReadDictionary() (dictionary map[string]string) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		words := strings.Split(line, "-")
-		englishWord := string(words[1])
-		russianWord := string(words[0])
+		englishWord := string(words[0])
+		russianWord := string(words[1])
 		dictionary[englishWord] = russianWord
 	}
 

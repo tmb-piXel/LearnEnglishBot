@@ -7,5 +7,6 @@ import (
 )
 
 func main() {
-	fmt.Println(storage.ReadDictionary())
+	dict := storage.ReadDictionary()
+	fmt.Println(dict)
 }

@@ -1,17 +1,21 @@
 package telegram
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+import (
+	"strings"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+)
 
 const (
 	commandStart = "start"
 )
 
-func (b *Bot) handleCommand(message *tgbotapi.Message) (isEnteredStart bool, err error) {
+func (b *Bot) handleCommand(message *tgbotapi.Message, enWord string) (isEnteredStart bool, err error) {
 	isEnteredStart = false
 	switch message.Command() {
 	case commandStart:
 		isEnteredStart = true
-		err = b.handleStartCommand(message)
+		err = b.handleStartCommand(message, enWord)
 	default:
 		err = b.handleUnknownCommand(message)
 	}
@@ -19,25 +23,39 @@ func (b *Bot) handleCommand(message *tgbotapi.Message) (isEnteredStart bool, err
 }
 
 func (b *Bot) startChat(chatID int64) error {
-	msg := tgbotapi.NewMessage(chatID, "Введите /start")
-	_, err := b.bot.Send(msg)
+	err := b.sendMessage(chatID, b.messages.Start)
 	return err
 }
 
-func (b *Bot) handleStartCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "enWord")
-	_, err := b.bot.Send(msg)
+func (b *Bot) handleStartCommand(message *tgbotapi.Message, enWord string) error {
+	err := b.sendMessage(message.Chat.ID, b.messages.AlreadyStart)
+	err = b.sendMessage(message.Chat.ID, enWord)
 	return err
 }
 
 func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "UnknownCommand")
-	_, err := b.bot.Send(msg)
+	err := b.sendMessage(message.Chat.ID, b.messages.UnknownCommand)
 	return err
 }
 
-func (b *Bot) handleMessage(message *tgbotapi.Message) error {
-	msg := tgbotapi.NewMessage(message.Chat.ID, "enWord")
-	_, err := b.bot.Send(msg)
+func (b *Bot) sendEnWord(message *tgbotapi.Message, enWord string) error {
+	err := b.sendMessage(message.Chat.ID, enWord)
+	return err
+}
+
+func (b *Bot) checkAnswer(message *tgbotapi.Message, enWord string, dictionary map[string]string) error {
+	if strings.Contains(dictionary[enWord], message.Text) {
+		err := b.sendMessage(message.Chat.ID, b.messages.CorrectAnswer)
+		return err
+	} else {
+		err := b.sendMessage(message.Chat.ID, b.messages.WrongAnswer)
+		err = b.sendMessage(message.Chat.ID, b.messages.TheCorrectAnswerWas+dictionary[enWord])
+		return err
+	}
+}
+
+func (b *Bot) sendMessage(chatID int64, msg string) error {
+	message := tgbotapi.NewMessage(chatID, msg)
+	_, err := b.bot.Send(message)
 	return err
 }
