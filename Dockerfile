@@ -13,8 +13,7 @@ FROM alpine:latest
 WORKDIR /root/
 
 COPY --from=0 /github.com/tmb-piXel/telegramBotForLearningEnglish/.bin/bot .
+COPY --from=0 /github.com/tmb-piXel/telegramBotForLearningEnglish/configs configs/
 COPY dictionary /root/ 
-
-EXPOSE 80
 
 CMD ["./bot"]

@@ -8,8 +8,6 @@ import (
 	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/telegram"
 )
 
-//const telegramToken = `1653360099:AAEidSka74r1KJtq9nzgpoZFEfeZbnfeyvQ`
-
 func main() {
 
 	cfg, err := config.Init()

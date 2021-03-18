@@ -1,8 +1,6 @@
 package telegram
 
 import (
-	"strings"
-
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -44,7 +42,7 @@ func (b *Bot) sendEnWord(message *tgbotapi.Message, enWord string) error {
 }
 
 func (b *Bot) checkAnswer(message *tgbotapi.Message, enWord string, dictionary map[string]string) error {
-	if strings.Contains(dictionary[enWord], message.Text) {
+	if compaire(dictionary[enWord], message.Text) == true {
 		err := b.sendMessage(message.Chat.ID, b.messages.CorrectAnswer)
 		return err
 	} else {
