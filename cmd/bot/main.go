@@ -1,19 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/config"
+	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/storage"
 	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/telegram"
 )
 
 func main() {
-
 	cfg, err := config.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println(cfg)
 
 	botAPI, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
 	if err != nil {
@@ -24,7 +27,8 @@ func main() {
 
 	log.Printf("Authorized on account %s", botAPI.Self.UserName)
 
-	bot := telegram.NewBot(botAPI, cfg.Messages)
+	dictionary := storage.ReadDictionary(cfg.DictionaryFile)
+	bot := telegram.NewBot(botAPI, dictionary, cfg.Messages)
 
 	if err := bot.Start(); err != nil {
 		log.Fatal(err)

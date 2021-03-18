@@ -1,3 +1,5 @@
+dictionary_file: "dictionary"
+
 messages:
   responses:
     start: "Введите /start"
@@ -5,4 +7,4 @@ messages:
     unknown_command: "Я не знаю такой команды"
     correct_answer: "Поздравляю, это правильный ответ"
     wrong_answer: "Упс, это неправильный ответ"
-    theCorrectAnswerWas: "Правильный ответ был: "
+    the_correct_answer_was: "Правильный ответ был: "

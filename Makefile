@@ -2,10 +2,10 @@ run:
 	go run ./cmd/bot/main.go
 
 build-image:
-	docker build -t pixel68tmb/telegram_bot:latest
+	docker build -t pixel68tmb/telegram_bot:latest .
 
 start-container:
-	docker run --rm -idt --name telegram_bot pixel68tmb/telegram_bot:latest
+	docker run --rm -idt --name telegram_bot --env-file .env pixel68tmb/telegram_bot:latest 
 
 delete-unused-images:
 	docker image prune -fa

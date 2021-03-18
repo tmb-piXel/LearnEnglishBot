@@ -5,24 +5,25 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/config"
-	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/storage"
 )
 
 type Bot struct {
-	bot      *tgbotapi.BotAPI
-	messages config.Messages
+	bot        *tgbotapi.BotAPI
+	dictionary map[string]string
+	messages   config.Messages
 }
 
-func NewBot(bot *tgbotapi.BotAPI, messages config.Messages) *Bot {
+func NewBot(bot *tgbotapi.BotAPI, dictionary map[string]string, messages config.Messages) *Bot {
 	return &Bot{
-		bot:      bot,
-		messages: messages,
+		bot:        bot,
+		dictionary: dictionary,
+		messages:   messages,
 	}
 }
 
 func (b *Bot) Start() error {
 	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	u.Timeout = 600
 
 	updates, err := b.bot.GetUpdatesChan(u)
 	if err != nil {
@@ -32,7 +33,6 @@ func (b *Bot) Start() error {
 	var isEnteredStart bool
 	IDofUserChats := make(map[int64]bool) //Map key - chatID, value - isEnteredStart
 	enWord := make(map[int64]string)      //Map key - chatID, value - enWord
-	dictionary := storage.ReadDictionary()
 
 	for update := range updates {
 		if update.Message == nil {
@@ -47,10 +47,9 @@ func (b *Bot) Start() error {
 			b.startChat(chatID)
 		} else if update.Message.IsCommand() {
 			//Check the message is this command or not and processing commands
-			enWord[chatID] = getRandomKey(dictionary)
+			enWord[chatID] = getRandomKey(b.dictionary)
 			isEnteredStart, _ = b.handleCommand(update.Message, enWord[chatID])
 			IDofUserChats[chatID] = isEnteredStart
-			fmt.Println(IDofUserChats)
 			if IDofUserChats[chatID] != true {
 				b.startChat(chatID)
 				continue
@@ -59,8 +58,8 @@ func (b *Bot) Start() error {
 			//Processing messages
 			fmt.Println(IDofUserChats)
 			if IDofUserChats[chatID] == true {
-				b.checkAnswer(update.Message, enWord[chatID], dictionary)
-				enWord[chatID] = getRandomKey(dictionary)
+				b.checkAnswer(update.Message, enWord[chatID], b.dictionary)
+				enWord[chatID] = getRandomKey(b.dictionary)
 				b.sendEnWord(update.Message, enWord[chatID])
 			} else {
 				b.startChat(chatID)

@@ -1,8 +1,6 @@
 package config
 
 import (
-	"os"
-
 	"github.com/spf13/viper"
 )
 
@@ -13,15 +11,16 @@ type Messages struct {
 type Responses struct {
 	Start               string `mapstructure:"start"`
 	AlreadyStart        string `mapstructure:"already_start"`
-	UnknownCommand      string `mapsturcture:"unknown_command"`
+	UnknownCommand      string `mapstructure:"unknown_command"`
 	CorrectAnswer       string `mapstructure:"correct_answer"`
 	WrongAnswer         string `mapstructure:"wrong_answer"`
-	TheCorrectAnswerWas string `mapsturcture:"theCorrectAnswerWas"`
+	TheCorrectAnswerWas string `mapstructure:"the_correct_answer_was"`
 }
 
 type Config struct {
-	TelegramToken string
-	Messages      Messages
+	TelegramToken  string
+	DictionaryFile string `mapstructure:"dictionary_file"`
+	Messages       Messages
 }
 
 func Init() (*Config, error) {
@@ -49,7 +48,6 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	os.Setenv("TELEGRAMTOKEN", "1653360099:AAEidSka74r1KJtq9nzgpoZFEfeZbnfeyvQ")
 	if err := viper.BindEnv("telegramtoken"); err != nil {
 		return err
 	}

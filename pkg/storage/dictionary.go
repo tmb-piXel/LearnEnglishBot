@@ -7,10 +7,8 @@ import (
 	"strings"
 )
 
-const dictionaryFile = `dictionary`
-
 //Read the dictionary from the file
-func ReadDictionary() (dictionary map[string]string) {
+func ReadDictionary(dictionaryFile string) (dictionary map[string]string) {
 	file, err := os.Open(dictionaryFile)
 
 	if err != nil {
