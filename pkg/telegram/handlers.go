@@ -27,6 +27,9 @@ func (b *Bot) startChat(chatID int64) error {
 
 func (b *Bot) handleStartCommand(message *tgbotapi.Message, enWord string) error {
 	err := b.sendMessage(message.Chat.ID, b.messages.AlreadyStart)
+	if err != nil {
+		return err
+	}
 	err = b.sendMessage(message.Chat.ID, enWord)
 	return err
 }
@@ -42,11 +45,14 @@ func (b *Bot) sendEnWord(message *tgbotapi.Message, enWord string) error {
 }
 
 func (b *Bot) checkAnswer(message *tgbotapi.Message, enWord string, dictionary map[string]string) error {
-	if compaire(dictionary[enWord], message.Text) == true {
+	if compaire(dictionary[enWord], message.Text) {
 		err := b.sendMessage(message.Chat.ID, b.messages.CorrectAnswer)
 		return err
 	} else {
 		err := b.sendMessage(message.Chat.ID, b.messages.WrongAnswer)
+		if err != nil {
+			return err
+		}
 		err = b.sendMessage(message.Chat.ID, b.messages.TheCorrectAnswerWas+dictionary[enWord])
 		return err
 	}

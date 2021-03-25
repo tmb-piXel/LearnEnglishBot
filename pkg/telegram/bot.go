@@ -41,7 +41,7 @@ func (b *Bot) Start() error {
 
 		chatID := update.Message.Chat.ID
 
-		if contains(IDofUserChats, chatID) == false {
+		if !contains(IDofUserChats, chatID) {
 			//Check if a new user
 			IDofUserChats[chatID] = false
 			b.startChat(chatID)
@@ -50,14 +50,14 @@ func (b *Bot) Start() error {
 			enWord[chatID] = getRandomKey(b.dictionary)
 			isEnteredStart, _ = b.handleCommand(update.Message, enWord[chatID])
 			IDofUserChats[chatID] = isEnteredStart
-			if IDofUserChats[chatID] != true {
+			if !IDofUserChats[chatID] {
 				b.startChat(chatID)
 				continue
 			}
 		} else {
 			//Processing messages
 			fmt.Println(IDofUserChats)
-			if IDofUserChats[chatID] == true {
+			if IDofUserChats[chatID] {
 				b.checkAnswer(update.Message, enWord[chatID], b.dictionary)
 				enWord[chatID] = getRandomKey(b.dictionary)
 				b.sendEnWord(update.Message, enWord[chatID])

@@ -24,6 +24,7 @@ func getRandomKey(m map[string]string) string {
 func compaire(correct string, answer string) bool {
 	flag := false
 	answer = strings.ToLower(answer)
+	answer = strings.Trim(answer, " ")
 	words := strings.Split(correct, "/")
 	for _, word := range words {
 		word = strings.Trim(word, " ")
