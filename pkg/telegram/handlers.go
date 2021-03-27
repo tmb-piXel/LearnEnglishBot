@@ -45,7 +45,7 @@ func (b *Bot) sendEnWord(message *tgbotapi.Message, enWord string) error {
 }
 
 func (b *Bot) checkAnswer(message *tgbotapi.Message, enWord string, dictionary map[string]string) error {
-	if compaire(dictionary[enWord], message.Text) {
+	if Compaire(dictionary[enWord], message.Text) {
 		err := b.sendMessage(message.Chat.ID, b.messages.CorrectAnswer)
 		return err
 	} else {

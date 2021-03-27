@@ -1,6 +1,9 @@
 run:
 	go run ./cmd/bot/main.go
 
+run-tests:
+	go test -v ./tests/
+
 build-image:
 	docker build -t pixel68tmb/telegram_bot:latest .
 

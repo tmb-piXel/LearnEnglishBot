@@ -41,7 +41,7 @@ func (b *Bot) Start() error {
 
 		chatID := update.Message.Chat.ID
 
-		if !contains(IDofUserChats, chatID) {
+		if !Contains(IDofUserChats, chatID) {
 			//Check if a new user
 			IDofUserChats[chatID] = false
 			b.startChat(chatID)

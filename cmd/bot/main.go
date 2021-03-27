@@ -15,7 +15,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	botAPI, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
+	//	botAPI, err := tgbotapi.NewBotAPI(cfg.TelegramToken)
+	botAPI, err := tgbotapi.NewBotAPI(`1653360099:AAH7Xk3AU0HJYsb-B4sYX2qmu3MghuEDSM0`)
 	if err != nil {
 		log.Panic(err)
 	}

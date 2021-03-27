@@ -2,8 +2,8 @@ package telegram
 
 import "strings"
 
-//Check if a element in slice
-func contains(m map[int64]bool, e int64) bool {
+//Contains - check if a element in slice
+func Contains(m map[int64]bool, e int64) bool {
 	for a := range m {
 		if a == e {
 			return true
@@ -20,8 +20,8 @@ func getRandomKey(m map[string]string) string {
 	return ""
 }
 
-//Compaires the user's answer to the correct answer
-func compaire(correct string, answer string) bool {
+//Compaire - compaires the user's answer to the correct answer
+func Compaire(correct string, answer string) bool {
 	flag := false
 	answer = strings.ToLower(answer)
 	answer = strings.Trim(answer, " ")
