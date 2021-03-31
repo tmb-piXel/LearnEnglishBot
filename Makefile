@@ -1,6 +1,9 @@
 run:
 	go run ./cmd/bot/main.go
 
+readDictionary:
+	go run ./cmd/dictionary/main.go
+	
 run-tests:
 	go test -v ./tests/
 
@@ -15,6 +18,3 @@ delete-unused-images:
 
 delete-all-containers:
 	docker rm $(shell docker ps -qa)
-
-readDictionary:
-	go run ./cmd/dictionary/main.go

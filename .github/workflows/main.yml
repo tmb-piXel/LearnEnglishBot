@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  REGISTRY: "pixel68tmb"
+  BOT_IMAGE: "telegram_bot"
+  CONTAINER_NAME: "telegram_bot"
+
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with: 
+          go-version: 1.15
+          
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Unit tests
+        run: go test ./tests/
+
+  build_and_push:
+    runs-on: ubuntu-latest
+    needs: tests
+    
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v2
+
+      - name: Build docker image
+        run: docker build -t $(echo $REGISTRY)/$(echo $BOT_IMAGE):$(echo $GITHUB_SHA | head -c7)
+
+      - name: Push docker image on dockerhub
+        run: docker push $(echo $REGISTRY)/$(echo $BOT_IMAGE):$(echo $GITHUB_SHA | head -c7)
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
+
+    steps:
+      - name: Deploy on Yandex cloud
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          key: ${{ secrets.SSHKEY }}
+          script: |
+            # Stop runnig container
+            docker stop $(echo $CONTAINER_NAME)
+
+            # Remove old container
+            docker rm $(echo $CONTAINER_NAME)
+
+            # Remove unused images
+            docker image prune -fa
+
+            # Set env variables
+            export TELEGRAMTOKEN=${{ secrets.TELEGRAMTOKEN }}
+
+            # Run a new container from a new image
+            docker run \
+            -idt \
+            --restart always \
+            --name $(echo CONTAINER_NAME) \
+            -e TELEGRAMTOKEN \
+            $(echo $REGISTRY)/$(echo $BOT_IMAGE):$(echo $GITHUB_SHA | head -c7)
+
+

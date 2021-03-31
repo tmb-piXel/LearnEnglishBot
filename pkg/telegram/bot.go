@@ -47,7 +47,7 @@ func (b *Bot) Start() error {
 			b.startChat(chatID)
 		} else if update.Message.IsCommand() {
 			//Check the message is this command or not and processing commands
-			enWord[chatID] = getRandomKey(b.dictionary)
+			enWord[chatID] = GetRandomKey(b.dictionary)
 			isEnteredStart, _ = b.handleCommand(update.Message, enWord[chatID])
 			IDofUserChats[chatID] = isEnteredStart
 			if !IDofUserChats[chatID] {
@@ -59,7 +59,7 @@ func (b *Bot) Start() error {
 			fmt.Println(IDofUserChats)
 			if IDofUserChats[chatID] {
 				b.checkAnswer(update.Message, enWord[chatID], b.dictionary)
-				enWord[chatID] = getRandomKey(b.dictionary)
+				enWord[chatID] = GetRandomKey(b.dictionary)
 				b.sendEnWord(update.Message, enWord[chatID])
 			} else {
 				b.startChat(chatID)
