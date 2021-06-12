@@ -2,10 +2,12 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/storage"
 )
 
 const (
 	commandStart = "start"
+	setLanguage  = "set"
 )
 
 func (b *Bot) handleCommand(message *tgbotapi.Message, enWord string) (isEnteredStart bool, err error) {
@@ -14,10 +16,17 @@ func (b *Bot) handleCommand(message *tgbotapi.Message, enWord string) (isEntered
 	case commandStart:
 		isEnteredStart = true
 		err = b.handleStartCommand(message, enWord)
+	case setLanguage:
+		b.handleSetLanguage(message)
 	default:
 		err = b.handleUnknownCommand(message)
 	}
 	return isEnteredStart, err
+}
+
+func (b *Bot) handleSetLanguage(message *tgbotapi.Message) {
+	c := message.CommandArguments()
+	b.dictionary = storage.ReadDictionary("dictionaries/" + c)
 }
 
 func (b *Bot) startChat(chatID int64) error {

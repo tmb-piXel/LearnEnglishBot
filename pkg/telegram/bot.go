@@ -24,7 +24,6 @@ func NewBot(bot *tgbotapi.BotAPI, dictionary map[string]string, messages config.
 func (b *Bot) Start() error {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 600
-
 	updates, err := b.bot.GetUpdatesChan(u)
 	if err != nil {
 		return err

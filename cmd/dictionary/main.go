@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	dict := storage.ReadDictionary(`dictionary`)
+	dict := storage.ReadDictionary(`dictionaries/english`)
 	start := time.Now()
 	s := telegram.GetRandomKey(dict)
 	end := time.Now()
