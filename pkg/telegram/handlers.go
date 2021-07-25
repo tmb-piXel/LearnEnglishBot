@@ -2,7 +2,6 @@ package telegram
 
 import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/storage"
 )
 
 const (
@@ -25,8 +24,18 @@ func (b *Bot) handleCommand(message *tgbotapi.Message, enWord string) (isEntered
 }
 
 func (b *Bot) handleSetLanguage(message *tgbotapi.Message) {
-	c := message.CommandArguments()
-	b.dictionary = storage.ReadDictionary("dictionaries/" + c)
+	// c := message.CommandArguments()
+	// b.dictionary = storage.ReadDictionary("dictionaries/" + c)
+	msg := tgbotapi.NewMessage(message.Chat.ID, "Select your class")
+
+	btn := tgbotapi.NewInlineKeyboardButtonData("ste", "set")
+	var row []tgbotapi.InlineKeyboardButton
+	row = append(row, btn)
+	keyboard := tgbotapi.InlineKeyboardMarkup{}
+	keyboard.InlineKeyboard = append(keyboard.InlineKeyboard, row)
+
+	msg.ReplyMarkup = keyboard
+	b.bot.Send(msg)
 }
 
 func (b *Bot) startChat(chatID int64) error {

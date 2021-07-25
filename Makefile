@@ -1,6 +1,9 @@
 run:
 	go run ./cmd/bot/main.go
 
+telebot:
+	go run ./cmd/telebot/main.go
+
 readDictionary:
 	go run ./cmd/dictionary/main.go
 	
