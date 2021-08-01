@@ -1,10 +1,12 @@
-dictionary_file: "dictionaries/english"
+dictionary_file: "dictionaries"
 
 messages:
   responses:
-    start: "Введите /start"
+    start_message: "Добрый день! Нажмите старт"
     already_start: "Я заработал"
     unknown_command: "Я не знаю такой команды"
     correct_answer: "Поздравляю, это правильный ответ"
     wrong_answer: "Упс, это неправильный ответ"
     the_correct_answer_was: "Правильный ответ был: "
+    select_language: "Выберите язык"
+    

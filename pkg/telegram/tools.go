@@ -13,7 +13,7 @@ func Contains(m map[int64]bool, e int64) bool {
 }
 
 //GetRandomKey - get random key from map
-func GetRandomKey(m map[string]string) string {
+func GetRandomWord(m map[string]string) string {
 	for enW := range m {
 		return enW
 	}
@@ -21,7 +21,7 @@ func GetRandomKey(m map[string]string) string {
 }
 
 //Compaire - compaires the user's answer to the correct answer
-func Compaire(correct string, answer string) bool {
+func CheckAnswer(correct string, answer string) bool {
 	flag := false
 	answer = strings.ToLower(answer)
 	answer = strings.Trim(answer, " ")

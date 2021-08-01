@@ -2,32 +2,43 @@ package storage
 
 import (
 	"bufio"
+	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 )
 
 //Read the dictionary from the file
-func ReadDictionary(dictionaryFile string) (dictionary map[string]string) {
-	file, err := os.Open(dictionaryFile)
-
+func ReadDictionaries(pathDictionary string) (dictionaries map[string]map[string]string) {
+	files, err := ioutil.ReadDir(pathDictionary)
 	if err != nil {
-		log.Fatalf("failed opening file: %s", err)
+		log.Printf("Failed read path with dictionaries: %s", err)
 	}
 
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	dictionary = make(map[string]string)
+	dictionaries = make(map[string]map[string]string)
 
-	for scanner.Scan() {
-		line := scanner.Text()
-		words := strings.Split(line, "-")
-		englishWord := string(words[0])
-		russianWord := string(words[1])
-		dictionary[englishWord] = russianWord
+	for _, f := range files {
+		file, err := os.Open(pathDictionary + "/" + f.Name())
+
+		if err != nil {
+			log.Printf("Failed opening file: %s", err)
+		}
+
+		scanner := bufio.NewScanner(file)
+		scanner.Split(bufio.ScanLines)
+		dictionary := make(map[string]string)
+
+		for scanner.Scan() {
+			line := scanner.Text()
+			words := strings.Split(line, "-")
+			original := string(words[0])
+			translated := string(words[1])
+			dictionary[original] = translated
+		}
+
+		file.Close()
+		dictionaries[f.Name()] = dictionary
 	}
 
-	file.Close()
-
-	return dictionary
+	return
 }

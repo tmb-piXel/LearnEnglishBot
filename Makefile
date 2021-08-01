@@ -1,10 +1,7 @@
-run:
+bot:
 	go run ./cmd/bot/main.go
 
-telebot:
-	go run ./cmd/telebot/main.go
-
-readDictionary:
+dictionary:
 	go run ./cmd/dictionary/main.go
 	
 run-tests:
