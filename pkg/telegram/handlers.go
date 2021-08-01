@@ -1,65 +1,88 @@
 package telegram
 
 import (
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tb "gopkg.in/tucnak/telebot.v2"
 )
 
-const (
-	commandStart = "start"
-)
+var dictionary = make(map[int64]map[string]string) //Dictionary for chatID
+var words = make(map[int64]string)                 //Words for chatID
+var IsTheStartPressed = make(map[int64]bool)       //Is the start pressed for chatID
 
-func (b *Bot) handleCommand(message *tgbotapi.Message, enWord string) (isEnteredStart bool, err error) {
-	isEnteredStart = false
-	switch message.Command() {
-	case commandStart:
-		isEnteredStart = true
-		err = b.handleStartCommand(message, enWord)
-	default:
-		err = b.handleUnknownCommand(message)
-	}
-	return isEnteredStart, err
-}
+func (b *Bot) Handle() {
+	var (
+		menu        = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		startMarkup = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		setlang     = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 
-func (b *Bot) startChat(chatID int64) error {
-	err := b.sendMessage(chatID, b.messages.Start)
-	return err
-}
+		btnHelp     = menu.Text("ℹ Help")
+		btnSettings = menu.Text("⚙ Settings")
+		btnStart    = startMarkup.Text("Start")
 
-func (b *Bot) handleStartCommand(message *tgbotapi.Message, enWord string) error {
-	err := b.sendMessage(message.Chat.ID, b.messages.AlreadyStart)
-	if err != nil {
-		return err
-	}
-	err = b.sendMessage(message.Chat.ID, enWord)
-	return err
-}
+		btnDE = setlang.Data("🇩🇪 DE", "German")
+		btnEN = setlang.Data("🇬🇧 EN", "English")
+	)
 
-func (b *Bot) handleUnknownCommand(message *tgbotapi.Message) error {
-	err := b.sendMessage(message.Chat.ID, b.messages.UnknownCommand)
-	return err
-}
+	startMarkup.Reply(
+		startMarkup.Row(btnStart),
+	)
+	menu.Reply(
+		menu.Row(btnHelp, btnSettings),
+	)
+	setlang.Inline(
+		setlang.Row(btnDE, btnEN),
+	)
 
-func (b *Bot) sendEnWord(message *tgbotapi.Message, enWord string) error {
-	err := b.sendMessage(message.Chat.ID, enWord)
-	return err
-}
-
-func (b *Bot) checkAnswer(message *tgbotapi.Message, enWord string, dictionary map[string]string) error {
-	if Compaire(dictionary[enWord], message.Text) {
-		err := b.sendMessage(message.Chat.ID, b.messages.CorrectAnswer)
-		return err
-	} else {
-		err := b.sendMessage(message.Chat.ID, b.messages.WrongAnswer)
-		if err != nil {
-			return err
+	b.bot.Handle(&btnStart, func(m *tb.Message) {
+		if !m.Private() {
+			return
 		}
-		err = b.sendMessage(message.Chat.ID, b.messages.TheCorrectAnswerWas+dictionary[enWord])
-		return err
-	}
-}
+		IsTheStartPressed[m.Chat.ID] = true
+		b.bot.Send(m.Chat, b.messages.SelectLanguage, setlang)
+	})
 
-func (b *Bot) sendMessage(chatID int64, msg string) error {
-	message := tgbotapi.NewMessage(chatID, msg)
-	_, err := b.bot.Send(message)
-	return err
+	b.bot.Handle(&btnHelp, func(m *tb.Message) {
+		b.bot.Send(m.Chat, "Help")
+	})
+
+	b.bot.Handle(&btnSettings, func(m *tb.Message) {
+		b.bot.Send(m.Chat, b.messages.SelectLanguage, setlang)
+	})
+
+	b.bot.Handle(&btnDE, func(c *tb.Callback) {
+		chatID := c.Message.Chat.ID
+		dictionary[chatID] = b.dictionaries["german"]
+		words[chatID] = GetRandomWord(dictionary[chatID])
+		b.bot.Send(c.Message.Chat, words[chatID], menu)
+
+		b.bot.Respond(c, &tb.CallbackResponse{
+			Text: "You have chosen German",
+		})
+	})
+
+	b.bot.Handle(&btnEN, func(c *tb.Callback) {
+		chatID := c.Message.Chat.ID
+		dictionary[chatID] = b.dictionaries["english"]
+		words[chatID] = GetRandomWord(dictionary[chatID])
+		b.bot.Send(c.Message.Chat, words[chatID], menu)
+
+		b.bot.Respond(c, &tb.CallbackResponse{
+			Text: "You have chosen English",
+		})
+	})
+
+	b.bot.Handle(tb.OnText, func(m *tb.Message) {
+		if IsTheStartPressed[m.Chat.ID] {
+			originalWord := dictionary[m.Chat.ID][words[m.Chat.ID]]
+			if CheckAnswer(originalWord, m.Text) {
+				b.bot.Send(m.Chat, b.messages.CorrectAnswer)
+			} else {
+				b.bot.Send(m.Chat, b.messages.WrongAnswer)
+				b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+originalWord)
+			}
+			words[m.Chat.ID] = GetRandomWord(dictionary[m.Chat.ID])
+			b.bot.Send(m.Chat, words[m.Chat.ID])
+		} else {
+			b.bot.Send(m.Chat, b.messages.StartMessage, startMarkup)
+		}
+	})
 }

@@ -1,7 +1,7 @@
-run:
+bot:
 	go run ./cmd/bot/main.go
 
-readDictionary:
+dictionary:
 	go run ./cmd/dictionary/main.go
 	
 run-tests:

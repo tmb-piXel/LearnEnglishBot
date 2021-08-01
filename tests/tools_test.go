@@ -3,10 +3,10 @@ package tests
 import (
 	"testing"
 
-	"github.com/tmb-piXel/telegramBotForLearningEnglish/pkg/telegram"
+	"github.com/tmb-piXel/LearnEnglishBot/pkg/telegram"
 )
 
-func TestCompaire(t *testing.T) {
+func TestCheckAnswer(t *testing.T) {
 	tables := []struct {
 		correct string
 		answer  string
@@ -20,7 +20,7 @@ func TestCompaire(t *testing.T) {
 	}
 
 	for _, table := range tables {
-		total := telegram.Compaire(table.correct, table.answer)
+		total := telegram.CheckAnswer(table.correct, table.answer)
 		if total != table.result {
 			t.Errorf(`%s+%s was incorrect got: %t, want: %t.`,
 				table.correct, table.answer, total, table.result)
