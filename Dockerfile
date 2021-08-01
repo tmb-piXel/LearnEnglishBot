@@ -14,6 +14,6 @@ WORKDIR /root/
 
 COPY --from=0 /github.com/tmb-piXel/LearEnglishBot/.bin/bot .
 COPY --from=0 /github.com/tmb-piXel/LearEnglishBot/configs configs/
-COPY dictionaries /root/ 
+COPY dictionaries /root/dictionaries
 
 CMD ["./bot"]
