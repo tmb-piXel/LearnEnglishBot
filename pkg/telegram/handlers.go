@@ -1,6 +1,8 @@
 package telegram
 
 import (
+	"strings"
+
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
@@ -14,23 +16,41 @@ func (b *Bot) Handle() {
 		startMarkup = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		setlang     = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 
-		btnHelp     = menu.Text("ℹ Help")
 		btnSettings = menu.Text("⚙ Settings")
 		btnStart    = startMarkup.Text("Start")
-
-		btnDE = setlang.Data("🇩🇪 DE", "German")
-		btnEN = setlang.Data("🇬🇧 EN", "English")
+		buttons     []tb.Btn
 	)
+
+	for title := range b.dictionaries {
+		codeName := strings.Split(title, "_")
+		buttons = append(buttons, setlang.Data(codeName[0], codeName[1]))
+	}
 
 	startMarkup.Reply(
 		startMarkup.Row(btnStart),
 	)
 	menu.Reply(
-		menu.Row(btnHelp, btnSettings),
+		menu.Row(btnSettings),
 	)
 	setlang.Inline(
-		setlang.Row(btnDE, btnEN),
+		setlang.Row(buttons...),
 	)
+
+	//Buttons selected language
+	for _, button := range buttons {
+		btn := button
+		callback := func(c *tb.Callback) {
+			chatID := c.Message.Chat.ID
+			dictionary[chatID] = b.dictionaries[btn.Text+"_"+btn.Unique]
+			words[chatID] = GetRandomWord(dictionary[chatID])
+			b.bot.Send(c.Message.Chat, words[chatID], menu)
+
+			b.bot.Respond(c, &tb.CallbackResponse{
+				Text: "You have chosen " + btn.Unique,
+			})
+		}
+		b.bot.Handle(&btn, callback)
+	}
 
 	b.bot.Handle(&btnStart, func(m *tb.Message) {
 		if !m.Private() {
@@ -40,34 +60,8 @@ func (b *Bot) Handle() {
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, setlang)
 	})
 
-	b.bot.Handle(&btnHelp, func(m *tb.Message) {
-		b.bot.Send(m.Chat, "Help")
-	})
-
 	b.bot.Handle(&btnSettings, func(m *tb.Message) {
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, setlang)
-	})
-
-	b.bot.Handle(&btnDE, func(c *tb.Callback) {
-		chatID := c.Message.Chat.ID
-		dictionary[chatID] = b.dictionaries["german"]
-		words[chatID] = GetRandomWord(dictionary[chatID])
-		b.bot.Send(c.Message.Chat, words[chatID], menu)
-
-		b.bot.Respond(c, &tb.CallbackResponse{
-			Text: "You have chosen German",
-		})
-	})
-
-	b.bot.Handle(&btnEN, func(c *tb.Callback) {
-		chatID := c.Message.Chat.ID
-		dictionary[chatID] = b.dictionaries["english"]
-		words[chatID] = GetRandomWord(dictionary[chatID])
-		b.bot.Send(c.Message.Chat, words[chatID], menu)
-
-		b.bot.Respond(c, &tb.CallbackResponse{
-			Text: "You have chosen English",
-		})
 	})
 
 	b.bot.Handle(tb.OnText, func(m *tb.Message) {

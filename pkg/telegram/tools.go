@@ -14,8 +14,8 @@ func Contains(m map[int64]bool, e int64) bool {
 
 //GetRandomKey - get random key from map
 func GetRandomWord(m map[string]string) string {
-	for enW := range m {
-		return enW
+	for word := range m {
+		return word
 	}
 	return ""
 }

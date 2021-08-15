@@ -54,6 +54,7 @@ func parseEnv(cfg *Config) error {
 	}
 
 	cfg.TelegramToken = viper.GetString("telegramtoken")
+	cfg.TelegramToken = `1653360099:AAHu1tOgMly0DFA-KecC7CeWuhnaF-f9_j8`
 
 	return nil
 }
