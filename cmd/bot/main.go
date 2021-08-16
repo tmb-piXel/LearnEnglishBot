@@ -28,8 +28,8 @@ func main() {
 		fmt.Printf("Bot did not start error: %s", err)
 	}
 
-	dictionaries := storage.ReadDictionaries(cfg.DictionaryFile)
-	bot := telegram.NewBot(botAPI, dictionaries, cfg.Messages)
+	storage.InitDictionaries(cfg.PathDictonaries)
+	bot := telegram.NewBot(botAPI, cfg.Messages)
 
 	if err := bot.Start(); err != nil {
 		log.Fatal(err)

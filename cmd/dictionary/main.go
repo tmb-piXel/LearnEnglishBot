@@ -2,17 +2,17 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/tmb-piXel/LearnEnglishBot/pkg/storage"
-	"github.com/tmb-piXel/LearnEnglishBot/pkg/telegram"
 )
 
 func main() {
-	dict := storage.ReadDictionaries(`dictionaries`)
-	start := time.Now()
-	s := telegram.GetRandomWord(dict["english"])
-	end := time.Now()
-	fmt.Println(s)
-	fmt.Println(end.Sub(start).Nanoseconds())
+	pathDictionary := "dictionaries"
+	storage.InitDictionaries(pathDictionary)
+
+	fmt.Println(storage.GetLanguages())
+	fmt.Println(storage.GetCode("Spain"))
+	fmt.Println(storage.GetTopicTitles("German"))
+	fmt.Println(storage.GetOriginalWords("English", "allE"))
+	fmt.Println(storage.GetTransletedWords("English", "allE"))
 }

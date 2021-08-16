@@ -19,9 +19,9 @@ type Responses struct {
 }
 
 type Config struct {
-	TelegramToken  string
-	DictionaryFile string `mapstructure:"dictionary_file"`
-	Messages       Messages
+	TelegramToken   string
+	PathDictonaries string `mapstructure:"path_dictionaries"`
+	Messages        Messages
 }
 
 func Init() (*Config, error) {
