@@ -1,6 +1,9 @@
 package telegram
 
-import "strings"
+import (
+	"math/rand"
+	"strings"
+)
 
 //Contains - check if a element in slice
 func Contains(m map[int64]bool, e int64) bool {
@@ -18,6 +21,19 @@ func GetRandomWord(m map[string]string) string {
 		return word
 	}
 	return ""
+}
+
+func GetRand(m map[string]string) string {
+	for _, word := range m {
+		return word
+	}
+	return ""
+}
+
+func GetR(a []string) int {
+	size := len(a)
+	r := rand.Intn(size)
+	return r
 }
 
 //Compaire - compaires the user's answer to the correct answer
