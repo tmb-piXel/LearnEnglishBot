@@ -11,8 +11,7 @@ func main() {
 	storage.InitDictionaries(pathDictionary)
 
 	fmt.Println(storage.GetLanguages())
-	fmt.Println(storage.GetCode("Spain"))
-	fmt.Println(storage.GetTopicTitles("German"))
-	fmt.Println(storage.GetOriginalWords("English", "allE"))
-	fmt.Println(storage.GetTransletedWords("English", "allE"))
+	fmt.Println(storage.GetTopicTitles("🇩🇪German"))
+	fmt.Println(storage.GetOriginalWords("🇩🇪German", "allG"))
+	fmt.Println(storage.GetTransletedWords("🇩🇪German", "allG"))
 }

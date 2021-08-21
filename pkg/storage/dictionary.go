@@ -10,7 +10,6 @@ import (
 
 type dictionary struct {
 	language string
-	code     string
 	topics   map[string]topic
 }
 
@@ -57,10 +56,8 @@ func readDictionaries(path string) (dictionaries map[string]dictionary) {
 			}
 			topics[titleTopic] = topic
 		}
-		codeLang := strings.Split(d.Name(), "_")
-		code := codeLang[0]
-		lang := codeLang[1]
-		dictionaries[lang] = dictionary{language: lang, code: code, topics: topics}
+		lang := d.Name()
+		dictionaries[lang] = dictionary{language: lang, topics: topics}
 	}
 	return
 }
@@ -72,11 +69,6 @@ func GetLanguages() (languages []string) {
 	return
 }
 
-func GetCode(language string) (code string) {
-	code = dictionaries[language].code
-	return
-}
-
 func GetTopicTitles(language string) (titles []string) {
 	for _, t := range dictionaries[language].topics {
 		titles = append(titles, t.title)
@@ -84,16 +76,22 @@ func GetTopicTitles(language string) (titles []string) {
 	return
 }
 
-func GetOriginalWords(language, title string) (originalwords *[]string) {
+func GetOriginalWords(language, topic string) (originalwords *[]string) {
 	for _, t := range dictionaries[language].topics {
-		originalwords = &t.originalwords
+		if t.title == topic {
+			originalwords = &t.originalwords
+			break
+		}
 	}
 	return
 }
 
-func GetTransletedWords(language, title string) (translatedWords *[]string) {
+func GetTransletedWords(language, topic string) (translatedWords *[]string) {
 	for _, t := range dictionaries[language].topics {
-		translatedWords = &t.translatedWords
+		if t.title == topic {
+			translatedWords = &t.translatedWords
+			break
+		}
 	}
 	return
 }

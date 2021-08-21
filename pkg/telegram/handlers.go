@@ -2,83 +2,89 @@ package telegram
 
 import (
 	"fmt"
-	"strings"
 
+	s "github.com/tmb-piXel/LearnEnglishBot/pkg/services"
 	"github.com/tmb-piXel/LearnEnglishBot/pkg/storage"
 	tb "gopkg.in/tucnak/telebot.v2"
 )
 
 //TODO make dictionariesInterface
 //TODO refactor handlers.go
-//TODO create model user and dboUsers
-
-var IsTheStartPressed = make(map[int64]bool) //Is the start pressed for chatID
-
-type user struct {
-	chatID        int64
-	isForeignToRU bool
-	original      *[]string
-	translated    *[]string
-	iWord         int
-}
-
-var users = make(map[int64]user)
+//TODO Ограничить список слов 400 симвалами
+//TODO Наполнить словари
 
 func (b *Bot) Handle() {
 	var (
-		menuMarkup  = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
-		startMarkup = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
-		langMarkup  = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
-		modeMarkup  = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
-
-		settingsBtn  = menuMarkup.Text("⚙ Settings")
-		startBtn     = startMarkup.Text("Start")
-		listBtn      = modeMarkup.Data("List", "List")
-		ruToBtn      = modeMarkup.Data("ruTo", "tuRu")
-		toRuBtn      = modeMarkup.Data("toRu", "toRu")
+		startMarkup  = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		menuMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		langMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		modeMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		topicsMarkup = make(map[string]*tb.ReplyMarkup)
-		langBtns     []tb.Btn
-		topicBtns    = make(map[string][]tb.Btn)
+
+		startBtn    = startMarkup.Text("Start")
+		settingsBtn = menuMarkup.Text("⚙ Настройки")
+		helpBtn     = menuMarkup.Text("Помощь")
+		setLangBtn  = modeMarkup.Text("Выбрать язык")
+		setTopicBtn = modeMarkup.Text("Выбрать тему")
+		listBtn     = modeMarkup.Text("Список слов")
+		fromRuBtn   = modeMarkup.Text("Перевод с русского")
+		toRuBtn     = modeMarkup.Text("Перевод на русский")
+		langBtns    []tb.Btn
+		topicBtns   = make(map[string][]tb.Btn)
 	)
 
 	languages := storage.GetLanguages()
 
-	//Set buttons and mapkup
+	//Set lang buttons and topics markup
 	for _, l := range languages {
-		codeLanguages := storage.GetCode(l)
-		langBtns = append(langBtns, langMarkup.Data(codeLanguages, l))
+		lang := l[8:] // delete flag
+		langBtn := langMarkup.Data(l, lang)
+		langBtns = append(langBtns, langBtn)
+
 		topicTitles := storage.GetTopicTitles(l)
-		topicsMarkup[l] = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+		topicsMarkup[lang] = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		for _, t := range topicTitles {
-			topicBtns[l] = append(topicBtns[l], topicsMarkup[l].Data(t, l+"_"+t))
+			topicBtn := topicsMarkup[lang].Data(t, lang+t)
+			topicBtns[lang] = append(topicBtns[lang], topicBtn)
 		}
-		topicsMarkup[l].Inline(topicsMarkup[l].Row(topicBtns[l]...))
+		topicsMarkup[lang].Inline(topicsMarkup[lang].Split(1, topicBtns[lang])...)
 	}
 
 	startMarkup.Reply(startMarkup.Row(startBtn))
-	menuMarkup.Reply(menuMarkup.Row(settingsBtn))
-
-	langMarkup.Inline(
-		langMarkup.Row(langBtns[0:len(langBtns)/2]...),
-		langMarkup.Row(langBtns[len(langBtns)/2:]...),
+	menuMarkup.Reply(menuMarkup.Row(settingsBtn, helpBtn))
+	modeMarkup.Reply(
+		modeMarkup.Row(listBtn),
+		modeMarkup.Row(setLangBtn, setTopicBtn),
+		modeMarkup.Row(fromRuBtn, toRuBtn),
 	)
-
-	modeMarkup.Inline(
-		langMarkup.Row(listBtn, ruToBtn, toRuBtn),
-	)
+	langMarkup.Inline(langMarkup.Split(1, langBtns)...)
 
 	//Handle start button
 	b.bot.Handle(&startBtn, func(m *tb.Message) {
 		if !m.Private() {
 			return
 		}
-		IsTheStartPressed[m.Chat.ID] = true
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
 	})
 
-	//Handel setting buttons
+	//Handel setting button
 	b.bot.Handle(&settingsBtn, func(m *tb.Message) {
+		b.bot.Send(m.Chat, "Настройки", modeMarkup)
+	})
+
+	//Handel help button
+	b.bot.Handle(&helpBtn, func(m *tb.Message) {
+		b.bot.Send(m.Chat, "Помощь")
+	})
+
+	//Handel setting language buttons
+	b.bot.Handle(&setLangBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
+	})
+
+	//Handel setting topics buttons
+	b.bot.Handle(&setTopicBtn, func(m *tb.Message) {
+		b.bot.Send(m.Chat, "Выберите тему", topicsMarkup[s.Language(m.Chat.ID)[8:]])
 	})
 
 	//Buttons selected language
@@ -88,6 +94,7 @@ func (b *Bot) Handle() {
 			b.bot.Respond(c, &tb.CallbackResponse{
 				Text: "You have chosen " + btn.Unique,
 			})
+			s.SetLanguage(c.Message.Chat.ID, btn.Text)
 			b.bot.Send(c.Message.Chat, "Выберите тему", topicsMarkup[btn.Unique])
 		}
 		b.bot.Handle(&btn, callback)
@@ -97,97 +104,52 @@ func (b *Bot) Handle() {
 	for _, buttons := range topicBtns {
 		for _, button := range buttons {
 			btn := button
-			lang := strings.Split(btn.Unique, "_")[0]
 			callback := func(c *tb.Callback) {
 				b.bot.Respond(c, &tb.CallbackResponse{
 					Text: "You have chosen " + btn.Text,
 				})
-				user := users[c.Message.Chat.ID]
-				user.original = storage.GetOriginalWords(lang, btn.Text)
-				user.translated = storage.GetTransletedWords(lang, btn.Text)
-				users[c.Message.Chat.ID] = user
-				b.bot.Send(c.Message.Chat, "Выберите режим", modeMarkup)
+				s.SetTopic(c.Message.Chat.ID, btn.Text)
+				b.bot.Send(c.Message.Chat, s.NewWord(c.Message.Chat.ID), menuMarkup)
 			}
 			b.bot.Handle(&btn, callback)
 		}
 	}
 
 	//Handle List
-	b.bot.Handle(&listBtn, func(c *tb.Callback) {
-		b.bot.Respond(c, &tb.CallbackResponse{
-			Text: "You have chosen " + listBtn.Unique,
-		})
-
-		chatID := c.Message.Chat.ID
-		var list []string
-		for i, w := range *users[chatID].original {
-			list = append(list, w+"-"+(*users[chatID].translated)[i])
-		}
-		_, err := b.bot.Send(c.Message.Chat, strings.Join(list, "\n"), menuMarkup)
+	b.bot.Handle(&listBtn, func(m *tb.Message) {
+		_, err := b.bot.Send(m.Chat, s.ListWords(m.Chat.ID), menuMarkup)
 		if err != nil {
 			fmt.Println(err)
 		}
+		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
 	})
 
 	//Handle ruTo
-	b.bot.Handle(&ruToBtn, func(c *tb.Callback) {
-		b.bot.Respond(c, &tb.CallbackResponse{
-			Text: "You have chosen " + ruToBtn.Unique,
-		})
-
-		chatID := c.Message.Chat.ID
-		user := users[chatID]
-		user.isForeignToRU = false
-		user.iWord = GetR(*user.translated)
-		word := (*user.translated)[user.iWord]
-		b.bot.Send(c.Message.Chat, word, menuMarkup)
-		users[chatID] = user
+	b.bot.Handle(&fromRuBtn, func(m *tb.Message) {
+		s.SetIsToRu(m.Chat.ID, false)
+		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
 	})
 
 	//Handle toRu
-	b.bot.Handle(&toRuBtn, func(c *tb.Callback) {
-		b.bot.Respond(c, &tb.CallbackResponse{
-			Text: "You have chosen " + toRuBtn.Unique,
-		})
-
-		chatID := c.Message.Chat.ID
-		user := users[chatID]
-		user.isForeignToRU = true
-		user.iWord = GetR(*user.original)
-		word := (*user.original)[user.iWord]
-		b.bot.Send(c.Message.Chat, word, menuMarkup)
-		users[chatID] = user
+	b.bot.Handle(&toRuBtn, func(m *tb.Message) {
+		s.SetIsToRu(m.Chat.ID, true)
+		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
 	})
 
 	b.bot.Handle(tb.OnText, func(m *tb.Message) {
 		chatID := m.Chat.ID
-		if IsTheStartPressed[chatID] {
-			user := users[chatID]
-			i := user.iWord
-
-			var first []string
-			var second []string
-			if user.isForeignToRU {
-				first = *user.original
-				second = *user.translated
-			} else {
-				first = *user.translated
-				second = *user.original
-			}
-
-			if CheckAnswer(second[i], m.Text) {
+		if s.IsUserExist(chatID) {
+			word := s.Word(chatID)
+			if CheckAnswer(word, m.Text) {
 				b.bot.Send(m.Chat, b.messages.CorrectAnswer)
 			} else {
 				b.bot.Send(m.Chat, b.messages.WrongAnswer)
-				b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+second[i])
+				b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+word)
 			}
 
-			i = GetR(first)
-			b.bot.Send(m.Chat, first[i])
-			user.iWord = i
-			users[m.Chat.ID] = user
+			b.bot.Send(m.Chat, s.NewWord(chatID))
 		} else {
-			users[chatID] = user{chatID: chatID}
+			s.NewUser(chatID)
 			b.bot.Send(m.Chat, b.messages.StartMessage, startMarkup)
 		}
 	})
