@@ -1,13 +1,11 @@
 package models
 
 type User struct {
-	chatID     int64
-	language   string
-	topic      string
-	isToRu     bool
-	original   *[]string
-	translated *[]string
-	iterWord   int
+	chatID   int64
+	language string
+	topic    string
+	isToRu   bool
+	iterWord int
 }
 
 func NewUser(chatID int64) *User {
@@ -29,12 +27,6 @@ func (u *User) SetTopic(t string) { u.topic = t }
 
 func (u *User) GetIsToRu() bool       { return u.isToRu }
 func (u *User) SetIsToRu(isToRu bool) { u.isToRu = isToRu }
-
-func (u *User) GetOriginal() *[]string  { return u.original }
-func (u *User) SetOriginal(o *[]string) { u.original = o }
-
-func (u *User) GetTransleted() *[]string  { return u.translated }
-func (u *User) SetTransleted(t *[]string) { u.translated = t }
 
 func (u *User) GetIterWord() int  { return u.iterWord }
 func (u *User) SetIterWord(i int) { u.iterWord = i }

@@ -12,16 +12,17 @@ import (
 //TODO refactor handlers.go
 //TODO Ограничить список слов 400 симвалами
 //TODO Наполнить словари
+//TODO Юнит тесты
+//TODO Добавление БД
+//TODO Логирование
 
 func (b *Bot) Handle() {
 	var (
-		startMarkup  = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		menuMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		langMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		modeMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		topicsMarkup = make(map[string]*tb.ReplyMarkup)
 
-		startBtn    = startMarkup.Text("Start")
 		settingsBtn = menuMarkup.Text("⚙ Настройки")
 		helpBtn     = menuMarkup.Text("Помощь")
 		setLangBtn  = modeMarkup.Text("Выбрать язык")
@@ -29,8 +30,8 @@ func (b *Bot) Handle() {
 		listBtn     = modeMarkup.Text("Список слов")
 		fromRuBtn   = modeMarkup.Text("Перевод с русского")
 		toRuBtn     = modeMarkup.Text("Перевод на русский")
-		langBtns    []tb.Btn
 		topicBtns   = make(map[string][]tb.Btn)
+		langBtns    []tb.Btn
 	)
 
 	languages := storage.GetLanguages()
@@ -50,7 +51,6 @@ func (b *Bot) Handle() {
 		topicsMarkup[lang].Inline(topicsMarkup[lang].Split(1, topicBtns[lang])...)
 	}
 
-	startMarkup.Reply(startMarkup.Row(startBtn))
 	menuMarkup.Reply(menuMarkup.Row(settingsBtn, helpBtn))
 	modeMarkup.Reply(
 		modeMarkup.Row(listBtn),
@@ -60,10 +60,8 @@ func (b *Bot) Handle() {
 	langMarkup.Inline(langMarkup.Split(1, langBtns)...)
 
 	//Handle start button
-	b.bot.Handle(&startBtn, func(m *tb.Message) {
-		if !m.Private() {
-			return
-		}
+	b.bot.Handle("/start", func(m *tb.Message) {
+		s.NewUser(m.Chat.ID)
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
 	})
 
@@ -75,16 +73,6 @@ func (b *Bot) Handle() {
 	//Handel help button
 	b.bot.Handle(&helpBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, "Помощь")
-	})
-
-	//Handel setting language buttons
-	b.bot.Handle(&setLangBtn, func(m *tb.Message) {
-		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
-	})
-
-	//Handel setting topics buttons
-	b.bot.Handle(&setTopicBtn, func(m *tb.Message) {
-		b.bot.Send(m.Chat, "Выберите тему", topicsMarkup[s.Language(m.Chat.ID)[8:]])
 	})
 
 	//Buttons selected language
@@ -124,6 +112,16 @@ func (b *Bot) Handle() {
 		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
 	})
 
+	//Handel setting language buttons
+	b.bot.Handle(&setLangBtn, func(m *tb.Message) {
+		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
+	})
+
+	//Handel setting topics buttons
+	b.bot.Handle(&setTopicBtn, func(m *tb.Message) {
+		b.bot.Send(m.Chat, "Выберите тему", topicsMarkup[s.Language(m.Chat.ID)[8:]])
+	})
+
 	//Handle ruTo
 	b.bot.Handle(&fromRuBtn, func(m *tb.Message) {
 		s.SetIsToRu(m.Chat.ID, false)
@@ -136,21 +134,17 @@ func (b *Bot) Handle() {
 		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
 	})
 
+	//Handle text message
 	b.bot.Handle(tb.OnText, func(m *tb.Message) {
 		chatID := m.Chat.ID
-		if s.IsUserExist(chatID) {
-			word := s.Word(chatID)
-			if CheckAnswer(word, m.Text) {
-				b.bot.Send(m.Chat, b.messages.CorrectAnswer)
-			} else {
-				b.bot.Send(m.Chat, b.messages.WrongAnswer)
-				b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+word)
-			}
-
-			b.bot.Send(m.Chat, s.NewWord(chatID))
+		word := s.Word(chatID)
+		if CheckAnswer(word, m.Text) {
+			b.bot.Send(m.Chat, b.messages.CorrectAnswer)
 		} else {
-			s.NewUser(chatID)
-			b.bot.Send(m.Chat, b.messages.StartMessage, startMarkup)
+			b.bot.Send(m.Chat, b.messages.WrongAnswer)
+			b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+word)
 		}
+
+		b.bot.Send(m.Chat, s.NewWord(chatID))
 	})
 }

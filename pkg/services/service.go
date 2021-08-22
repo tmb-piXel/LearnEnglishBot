@@ -13,36 +13,32 @@ func NewUser(chatID int64) {
 	r.SaveUser(u)
 }
 
-func IsUserExist(chatID int64) bool {
-	return r.IsUserExist(chatID)
-}
-
 func NewWord(chatID int64) (word string) {
 	u := r.GetUser(chatID)
-	words := u.GetTransleted()
+	words := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
 	if u.GetIsToRu() {
-		words = u.GetOriginal()
+		words = storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
 	}
-	i := getR(*words)
+	i := randomIter(*words)
 	word = (*words)[i]
 	u.SetIterWord(i)
 	return
 }
 
-func Word(chatID int64) (word string) {
-	u := r.GetUser(chatID)
-	words := u.GetOriginal()
-	if u.GetIsToRu() {
-		words = u.GetTransleted()
-	}
-	word = (*words)[u.GetIterWord()]
-	return
-}
-
-func getR(a []string) int {
+func randomIter(a []string) int {
 	size := len(a)
 	r := rand.Intn(size)
 	return r
+}
+
+func Word(chatID int64) (word string) {
+	u := r.GetUser(chatID)
+	words := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
+	if u.GetIsToRu() {
+		words = storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
+	}
+	word = (*words)[u.GetIterWord()]
+	return
 }
 
 func SetIsToRu(chatID int64, isToRu bool) {
@@ -63,14 +59,14 @@ func Language(chaID int64) string {
 func SetTopic(chatID int64, topic string) {
 	u := r.GetUser(chatID)
 	u.SetTopic(topic)
-	u.SetOriginal(storage.GetOriginalWords(u.GetLanguage(), u.GetTopic()))
-	u.SetTransleted(storage.GetTransletedWords(u.GetLanguage(), u.GetTopic()))
 }
 
 func ListWords(chatID int64) (list string) {
 	u := r.GetUser(chatID)
-	for i, w := range *u.GetOriginal() {
-		list += w + " - " + (*u.GetTransleted())[i] + "\n"
+	o := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
+	t := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
+	for i, w := range *o {
+		list += w + " - " + (*t)[i] + "\n"
 	}
 	return
 }

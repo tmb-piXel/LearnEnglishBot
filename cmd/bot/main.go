@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 
@@ -22,10 +21,10 @@ func main() {
 		Poller: &tb.LongPoller{Timeout: 60 * time.Second},
 	})
 
-	log.Printf("Authorized on account %s", botAPI.URL)
+	log.Printf("%s started", botAPI.Me.FirstName)
 
 	if err != nil {
-		fmt.Printf("Bot did not start error: %s", err)
+		log.Printf("Bot did not start error: %s", err)
 	}
 
 	storage.InitDictionaries(cfg.PathDictonaries)

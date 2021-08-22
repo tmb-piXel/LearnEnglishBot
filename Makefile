@@ -4,7 +4,7 @@ bot:
 dictionary:
 	go run ./cmd/dictionary/main.go
 	
-run-tests:
+tests:
 	go test -v ./tests/
 
 build-image:

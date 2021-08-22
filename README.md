@@ -6,6 +6,6 @@
 
 # Стек технологий:
 
-* Go 1.15
+* Go 1.17
 * Go-telegram-bot-api
 * Docker
