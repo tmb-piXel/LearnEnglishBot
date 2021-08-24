@@ -10,8 +10,11 @@ type User struct {
 
 func NewUser(chatID int64) *User {
 	u := &User{
-		chatID: chatID,
-		isToRu: true,
+		chatID:   chatID,
+		language: "🇩🇪German",
+		topic:    "allG",
+		isToRu:   true,
+		iterWord: 1,
 	}
 	return u
 }

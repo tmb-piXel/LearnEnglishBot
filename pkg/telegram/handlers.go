@@ -3,6 +3,7 @@ package telegram
 import (
 	"fmt"
 
+	log "github.com/tmb-piXel/LearnEnglishBot/pkg/logger"
 	s "github.com/tmb-piXel/LearnEnglishBot/pkg/services"
 	"github.com/tmb-piXel/LearnEnglishBot/pkg/storage"
 	tb "gopkg.in/tucnak/telebot.v2"
@@ -138,6 +139,8 @@ func (b *Bot) Handle() {
 	b.bot.Handle(tb.OnText, func(m *tb.Message) {
 		chatID := m.Chat.ID
 		word := s.Word(chatID)
+		log.Printf("ChatID: %d Name: %s original: %s translated: %s", chatID, m.Chat.FirstName, word, m.Text)
+		s.SaveWords(chatID, word, m.Text)
 		if CheckAnswer(word, m.Text) {
 			b.bot.Send(m.Chat, b.messages.CorrectAnswer)
 		} else {

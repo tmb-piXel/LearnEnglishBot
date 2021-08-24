@@ -3,6 +3,9 @@ bot:
 
 dictionary:
 	go run ./cmd/dictionary/main.go
+
+db:
+	go run ./cmd/db/main.go
 	
 tests:
 	go test -v ./tests/
