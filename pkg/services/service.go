@@ -3,22 +3,18 @@ package services
 import (
 	"math/rand"
 
+	"github.com/tmb-piXel/LearnEnglishBot/pkg/db"
 	m "github.com/tmb-piXel/LearnEnglishBot/pkg/models"
-	r "github.com/tmb-piXel/LearnEnglishBot/pkg/repositories"
 	"github.com/tmb-piXel/LearnEnglishBot/pkg/storage"
 )
 
 func NewUser(chatID int64) {
 	u := m.NewUser(chatID)
-	r.SaveUser(u)
-}
-
-func SaveWords(chatID int64, original, transleted string) {
-	r.SaveWords(chatID, original, transleted)
+	db.SaveUser(u)
 }
 
 func NewWord(chatID int64) (word string) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	words := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
 	if u.GetIsToRu() {
 		words = storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
@@ -26,7 +22,7 @@ func NewWord(chatID int64) (word string) {
 	i := randomIter(*words)
 	word = (*words)[i]
 	u.SetIterWord(i)
-	r.UpdateUser(u)
+	db.UpdateUser(u)
 	return
 }
 
@@ -37,7 +33,7 @@ func randomIter(a []string) int {
 }
 
 func Word(chatID int64) (word string) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	words := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
 	if u.GetIsToRu() {
 		words = storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
@@ -47,33 +43,36 @@ func Word(chatID int64) (word string) {
 }
 
 func SetIsToRu(chatID int64, isToRu bool) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	u.SetIsToRu(isToRu)
-	r.UpdateUser(u)
+	db.UpdateUser(u)
 }
 
 func SetLanguage(chatID int64, language string) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	u.SetLanguage(language)
-	r.UpdateUser(u)
+	db.UpdateUser(u)
 }
 
 func Language(chaID int64) string {
-	u := r.FindUser(chaID)
+	u := db.FindUser(chaID)
 	return u.GetLanguage()
 }
 
 func SetTopic(chatID int64, topic string) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	u.SetTopic(topic)
-	r.UpdateUser(u)
+	db.UpdateUser(u)
 }
 
 func ListWords(chatID int64) (list string) {
-	u := r.FindUser(chatID)
+	u := db.FindUser(chatID)
 	o := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
 	t := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
 	for i, w := range *o {
+		if len(list) >= 350 {
+			break
+		}
 		list += w + " - " + (*t)[i] + "\n"
 	}
 	return
