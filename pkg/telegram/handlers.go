@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"fmt"
+	"strconv"
 
 	log "github.com/tmb-piXel/LearnEnglishBot/pkg/logger"
 	s "github.com/tmb-piXel/LearnEnglishBot/pkg/services"
@@ -11,11 +12,10 @@ import (
 
 //TODO make dictionariesInterface
 //TODO refactor handlers.go
-//TODO Ограничить список слов 400 симвалами
 //TODO Наполнить словари
 //TODO Юнит тесты
-//TODO Добавление БД
 //TODO Логирование
+//TODO Исправить log onText
 
 func (b *Bot) Handle() {
 	var (
@@ -45,11 +45,18 @@ func (b *Bot) Handle() {
 
 		topicTitles := storage.GetTopicTitles(l)
 		topicsMarkup[lang] = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
+
+		var rows []tb.Row
+
 		for _, t := range topicTitles {
 			topicBtn := topicsMarkup[lang].Data(t, lang+t)
 			topicBtns[lang] = append(topicBtns[lang], topicBtn)
+
+			row := langMarkup.Row(topicBtn)
+			rows = append(rows, row)
 		}
-		topicsMarkup[lang].Inline(topicsMarkup[lang].Split(1, topicBtns[lang])...)
+
+		topicsMarkup[lang].Inline(rows...)
 	}
 
 	menuMarkup.Reply(menuMarkup.Row(settingsBtn, helpBtn))
@@ -58,22 +65,32 @@ func (b *Bot) Handle() {
 		modeMarkup.Row(setLangBtn, setTopicBtn),
 		modeMarkup.Row(fromRuBtn, toRuBtn),
 	)
-	langMarkup.Inline(langMarkup.Split(1, langBtns)...)
+
+	//List buttons
+	var rows []tb.Row
+	for _, b := range langBtns {
+		row := langMarkup.Row(b)
+		rows = append(rows, row)
+	}
+	langMarkup.Inline(rows...)
 
 	//Handle start button
 	b.bot.Handle("/start", func(m *tb.Message) {
 		s.NewUser(m.Chat.ID)
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
+		log.Printf("Enter start", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
 	})
 
 	//Handel setting button
 	b.bot.Handle(&settingsBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, "Настройки", modeMarkup)
+		log.Printf("Enter settings", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
 	})
 
 	//Handel help button
 	b.bot.Handle(&helpBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, "Помощь")
+		log.Printf("Enter help", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
 	})
 
 	//Buttons selected language
@@ -139,8 +156,15 @@ func (b *Bot) Handle() {
 	b.bot.Handle(tb.OnText, func(m *tb.Message) {
 		chatID := m.Chat.ID
 		word := s.Word(chatID)
-		log.Printf("ChatID: %d Name: %s original: %s translated: %s", chatID, m.Chat.FirstName, word, m.Text)
-		s.SaveWords(chatID, word, m.Text)
+
+		log.Printf("Original: %s, Transleted: %s, UserWord: %s",
+			strconv.FormatInt(chatID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+			word,
+			word,
+			m.Text,
+		)
+
 		if CheckAnswer(word, m.Text) {
 			b.bot.Send(m.Chat, b.messages.CorrectAnswer)
 		} else {

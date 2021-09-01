@@ -21,6 +21,7 @@ type Responses struct {
 type Config struct {
 	TelegramToken   string
 	PathDictonaries string `mapstructure:"path_dictionaries"`
+	PostgresqlUrl   string
 	Messages        Messages
 }
 
@@ -49,12 +50,14 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	if err := viper.BindEnv("telegramtoken"); err != nil {
+	if err := viper.BindEnv("telegramtoken", "postgresqlurl"); err != nil {
 		return err
 	}
 
 	cfg.TelegramToken = viper.GetString("telegramtoken")
 	cfg.TelegramToken = `1653360099:AAHu1tOgMly0DFA-KecC7CeWuhnaF-f9_j8`
+	cfg.PostgresqlUrl = viper.GetString("postgresqlurl")
+	cfg.PostgresqlUrl = `host=localhost port=5432 user=pixel password=passwordpolyglot dbname=polyglot sslmode=disable`
 
 	return nil
 }

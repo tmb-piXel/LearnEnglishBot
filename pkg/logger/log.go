@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"os"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -10,11 +8,7 @@ var Log *logrus.Logger
 
 func init() {
 	Log = logrus.New()
-	// if os.Getenv("environment") == "production" {
 	Log.SetFormatter(&logrus.JSONFormatter{})
-	f, _ := os.OpenFile("log", os.O_WRONLY|os.O_CREATE, 0755)
-	Log.SetOutput(f)
-	// }
 }
 
 func Println(args ...interface{}) {
@@ -22,7 +16,11 @@ func Println(args ...interface{}) {
 }
 
 func Printf(format string, args ...interface{}) {
-	Log.Printf(format, args...)
+	arguments := args[2:]
+	Log.WithFields(logrus.Fields{
+		"chatID":   args[0],
+		"fullName": args[1],
+	}).Printf(format, arguments...)
 }
 
 func Error(args ...interface{}) {
