@@ -65,6 +65,12 @@ func SetTopic(chatID int64, topic string) {
 	db.UpdateUser(u)
 }
 
+func GetTopic(chatID int64) (topic string) {
+	u := db.FindUser(chatID)
+	topic = u.GetTopic()
+	return
+}
+
 func ListWords(chatID int64) (list string) {
 	u := db.FindUser(chatID)
 	o := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())

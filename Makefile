@@ -28,3 +28,6 @@ delete-unused-images:
 
 delete-all-containers:
 	docker rm $(shell docker ps -qa)
+
+word:
+	go run ./cmd/words/main.go

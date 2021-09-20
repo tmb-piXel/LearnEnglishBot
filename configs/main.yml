@@ -3,10 +3,19 @@ path_dictionaries: "dictionaries"
 messages:
   responses:
     start_message: "Добрый день! Нажмите старт"
+    help_message: "Сообщение помощи"
     already_start: "Я заработал"
     unknown_command: "Я не знаю такой команды"
     correct_answer: "Поздравляю, это правильный ответ"
     wrong_answer: "Упс, это неправильный ответ"
     the_correct_answer_was: "Правильный ответ был: "
     select_language: "Выберите язык"
-    
+
+buttons:
+  set_lang: "Выберите язык"
+  settings: "⚙ Настройки"
+  help: "Помощь"
+  set_topic: "Выбрать тему"
+  list: "Список слов"
+  fromRu: "Перевод с русского"
+  toRu: "Перевод на русский"

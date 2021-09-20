@@ -1,40 +1,55 @@
 package logger
 
 import (
+	"fmt"
+	"path"
+	"runtime"
+
 	"github.com/sirupsen/logrus"
 )
 
-var Log *logrus.Logger
+var l *logrus.Logger
 
 func init() {
-	Log = logrus.New()
-	Log.SetFormatter(&logrus.JSONFormatter{})
+	l = logrus.New()
+	l.SetReportCaller(true)
+	l.SetFormatter(&logrus.JSONFormatter{
+		CallerPrettyfier: func(f *runtime.Frame) (function string, file string) {
+			filename := path.Base(f.File)
+			return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", filename, f.Line)
+		},
+		PrettyPrint: true,
+	})
 }
 
 func Println(args ...interface{}) {
-	Log.Print(args...)
+	l.Print(args...)
 }
 
 func Printf(format string, args ...interface{}) {
 	arguments := args[2:]
-	Log.WithFields(logrus.Fields{
+	l.WithFields(logrus.Fields{
 		"chatID":   args[0],
 		"fullName": args[1],
 	}).Printf(format, arguments...)
 }
 
 func Error(args ...interface{}) {
-	Log.Error(args...)
+	l.Error(args...)
 }
 
 func Errorf(format string, args ...interface{}) {
-	Log.Errorf(format, args...)
+	arguments := args[2:]
+	l.WithFields(logrus.Fields{
+		"chatID":   args[0],
+		"fullName": args[1],
+	}).Errorf(format, arguments...)
 }
 
 func Panic(args ...interface{}) {
-	Log.Panic(args...)
+	l.Panic(args...)
 }
 
 func Fatal(args ...interface{}) {
-	Log.Fatal(args...)
+	l.Fatal(args...)
 }

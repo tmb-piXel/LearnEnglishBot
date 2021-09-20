@@ -1,0 +1,25 @@
+version: '3.8'
+
+networks:
+  polyglotnet:
+
+services: 
+    polyglot:
+        container_name: polyglotbot
+        image: pixel68tmb/telegram_bot:latest
+        build: .
+        depends_on: 
+          - dbpostgresql
+
+    dbpostgresql:
+        image: postgres
+        container_name: db
+        ports:
+          - 5433:5432
+        volumes:
+          - ./initdb.sql:/docker-entrypoint-initdb.d/init.sql
+        environment: 
+          - POSTGRES_PASSWORD=postgres
+          - POSTGRES_USER=postgres
+          - POSTGRES_DB=postgres
+        restart: always

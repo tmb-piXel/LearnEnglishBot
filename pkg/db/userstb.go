@@ -57,7 +57,7 @@ func FindUser(id int64) *m.User {
 
 	switch err {
 	case sql.ErrNoRows:
-		log.Println("No rows were returned!")
+		log.Error("No rows were returned!")
 		return &u
 	case nil:
 		return &u

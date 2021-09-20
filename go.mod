@@ -9,6 +9,7 @@ require (
 )
 
 require (
+	github.com/andybalholm/cascadia v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgx v3.6.2+incompatible // indirect
@@ -24,8 +25,9 @@ require (
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tmb-piXel/telegramBotForLearningEnglish v0.0.0-20210503112739-55924c7599a6 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
+	golang.org/x/net v0.0.0-20210917221730-978cfadd31cf
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
-	golang.org/x/text v0.3.5 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

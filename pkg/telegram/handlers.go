@@ -1,7 +1,6 @@
 package telegram
 
 import (
-	"fmt"
 	"strconv"
 
 	log "github.com/tmb-piXel/LearnEnglishBot/pkg/logger"
@@ -15,7 +14,6 @@ import (
 //TODO Наполнить словари
 //TODO Юнит тесты
 //TODO Логирование
-//TODO Исправить log onText
 
 func (b *Bot) Handle() {
 	var (
@@ -24,13 +22,13 @@ func (b *Bot) Handle() {
 		modeMarkup   = &tb.ReplyMarkup{ResizeReplyKeyboard: true}
 		topicsMarkup = make(map[string]*tb.ReplyMarkup)
 
-		settingsBtn = menuMarkup.Text("⚙ Настройки")
-		helpBtn     = menuMarkup.Text("Помощь")
-		setLangBtn  = modeMarkup.Text("Выбрать язык")
-		setTopicBtn = modeMarkup.Text("Выбрать тему")
-		listBtn     = modeMarkup.Text("Список слов")
-		fromRuBtn   = modeMarkup.Text("Перевод с русского")
-		toRuBtn     = modeMarkup.Text("Перевод на русский")
+		settingsBtn = menuMarkup.Text(b.buttons.Settings)
+		helpBtn     = menuMarkup.Text(b.buttons.Help)
+		setLangBtn  = modeMarkup.Text(b.buttons.SetLang)
+		setTopicBtn = modeMarkup.Text(b.buttons.SetTopic)
+		listBtn     = modeMarkup.Text(b.buttons.List)
+		fromRuBtn   = modeMarkup.Text(b.buttons.FromRu)
+		toRuBtn     = modeMarkup.Text(b.buttons.ToRu)
 		topicBtns   = make(map[string][]tb.Btn)
 		langBtns    []tb.Btn
 	)
@@ -66,7 +64,7 @@ func (b *Bot) Handle() {
 		modeMarkup.Row(fromRuBtn, toRuBtn),
 	)
 
-	//List buttons
+	//List lang buttons
 	var rows []tb.Row
 	for _, b := range langBtns {
 		row := langMarkup.Row(b)
@@ -78,19 +76,31 @@ func (b *Bot) Handle() {
 	b.bot.Handle("/start", func(m *tb.Message) {
 		s.NewUser(m.Chat.ID)
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
-		log.Printf("Enter start", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
+
+		log.Printf("Handle start",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handel setting button
 	b.bot.Handle(&settingsBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, "Настройки", modeMarkup)
-		log.Printf("Enter settings", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
+
+		log.Printf("Handle settings",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handel help button
 	b.bot.Handle(&helpBtn, func(m *tb.Message) {
-		b.bot.Send(m.Chat, "Помощь")
-		log.Printf("Enter help", m.Chat.ID, m.Chat.FirstName+" "+m.Chat.LastName)
+		b.bot.Send(m.Chat, b.messages.HelpMessage)
+
+		log.Printf("Handle Help",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Buttons selected language
@@ -125,31 +135,56 @@ func (b *Bot) Handle() {
 	b.bot.Handle(&listBtn, func(m *tb.Message) {
 		_, err := b.bot.Send(m.Chat, s.ListWords(m.Chat.ID), menuMarkup)
 		if err != nil {
-			fmt.Println(err)
+			log.Error(err)
 		}
 		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
+
+		log.Printf("Handle List",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handel setting language buttons
 	b.bot.Handle(&setLangBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, b.messages.SelectLanguage, langMarkup)
+
+		log.Printf("Handle setLanguage",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handel setting topics buttons
 	b.bot.Handle(&setTopicBtn, func(m *tb.Message) {
 		b.bot.Send(m.Chat, "Выберите тему", topicsMarkup[s.Language(m.Chat.ID)[8:]])
+
+		log.Printf("Handle setTopic",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handle ruTo
 	b.bot.Handle(&fromRuBtn, func(m *tb.Message) {
 		s.SetIsToRu(m.Chat.ID, false)
 		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
+
+		log.Printf("Handle fromRu",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handle toRu
 	b.bot.Handle(&toRuBtn, func(m *tb.Message) {
 		s.SetIsToRu(m.Chat.ID, true)
 		b.bot.Send(m.Chat, s.NewWord(m.Chat.ID), menuMarkup)
+
+		log.Printf("Handle toRu",
+			strconv.FormatInt(m.Chat.ID, 10),
+			m.Chat.FirstName+" "+m.Chat.LastName,
+		)
 	})
 
 	//Handle text message
@@ -157,10 +192,9 @@ func (b *Bot) Handle() {
 		chatID := m.Chat.ID
 		word := s.Word(chatID)
 
-		log.Printf("Original: %s, Transleted: %s, UserWord: %s",
+		log.Printf("Transleted: %s, UserWord: %s",
 			strconv.FormatInt(chatID, 10),
 			m.Chat.FirstName+" "+m.Chat.LastName,
-			word,
 			word,
 			m.Text,
 		)
