@@ -7,7 +7,7 @@ dictionary:
 db:
 	go run ./cmd/db/main.go
 	
-tests:
+test:
 	go test -v ./tests/
 
 build-image:
