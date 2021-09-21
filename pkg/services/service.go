@@ -14,7 +14,7 @@ func NewUser(chatID int64) {
 }
 
 func NewWord(chatID int64) (word string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	words := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
 	if u.GetIsToRu() {
 		words = storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
@@ -33,7 +33,7 @@ func randomIter(a []string) int {
 }
 
 func Word(chatID int64) (word string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	words := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
 	if u.GetIsToRu() {
 		words = storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
@@ -43,36 +43,36 @@ func Word(chatID int64) (word string) {
 }
 
 func SetIsToRu(chatID int64, isToRu bool) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	u.SetIsToRu(isToRu)
 	db.UpdateUser(u)
 }
 
 func SetLanguage(chatID int64, language string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	u.SetLanguage(language)
 	db.UpdateUser(u)
 }
 
 func Language(chaID int64) string {
-	u := db.FindUser(chaID)
+	u, _ := db.GetUser(chaID)
 	return u.GetLanguage()
 }
 
 func SetTopic(chatID int64, topic string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	u.SetTopic(topic)
 	db.UpdateUser(u)
 }
 
 func GetTopic(chatID int64) (topic string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	topic = u.GetTopic()
 	return
 }
 
 func ListWords(chatID int64) (list string) {
-	u := db.FindUser(chatID)
+	u, _ := db.GetUser(chatID)
 	o := storage.GetOriginalWords(u.GetLanguage(), u.GetTopic())
 	t := storage.GetTransletedWords(u.GetLanguage(), u.GetTopic())
 	for i, w := range *o {
