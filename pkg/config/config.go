@@ -9,14 +9,13 @@ type Messages struct {
 }
 
 type Responses struct {
-	StartMessage        string `mapstructure:"start_message"`
-	HelpMessage         string `mapstructure:"help_message"`
-	AlreadyStart        string `mapstructure:"already_start"`
-	UnknownCommand      string `mapstructure:"unknown_command"`
-	CorrectAnswer       string `mapstructure:"correct_answer"`
-	WrongAnswer         string `mapstructure:"wrong_answer"`
-	TheCorrectAnswerWas string `mapstructure:"the_correct_answer_was"`
-	SelectLanguage      string `mapstructure:"select_language"`
+	StartMessage   string `mapstructure:"start_message"`
+	HelpMessage    string `mapstructure:"help_message"`
+	AlreadyStart   string `mapstructure:"already_start"`
+	UnknownCommand string `mapstructure:"unknown_command"`
+	CorrectAnswer  string `mapstructure:"correct_answer"`
+	WrongAnswer    string `mapstructure:"wrong_answer"`
+	SelectLanguage string `mapstructure:"select_language"`
 }
 
 type Config struct {

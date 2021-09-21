@@ -200,12 +200,9 @@ func (b *Bot) Handle() {
 		)
 
 		if CheckAnswer(word, m.Text) {
-			b.bot.Send(m.Chat, b.messages.CorrectAnswer)
+			b.bot.Send(m.Chat, b.messages.CorrectAnswer+"\n\n"+s.NewWord(chatID))
 		} else {
-			b.bot.Send(m.Chat, b.messages.WrongAnswer)
-			b.bot.Send(m.Chat, b.messages.TheCorrectAnswerWas+word)
+			b.bot.Send(m.Chat, b.messages.WrongAnswer+word+"\n\n"+s.NewWord(chatID))
 		}
-
-		b.bot.Send(m.Chat, s.NewWord(chatID))
 	})
 }
