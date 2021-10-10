@@ -6,16 +6,16 @@ import (
 )
 
 type Bot struct {
-	bot          *tb.Bot
-	dictionaries map[string]map[string]string
-	messages     config.Messages
+	bot      *tb.Bot
+	messages config.Messages
+	buttons  config.Buttons
 }
 
-func NewBot(bot *tb.Bot, dictionaries map[string]map[string]string, messages config.Messages) *Bot {
+func NewBot(bot *tb.Bot, messages config.Messages, buttons config.Buttons) *Bot {
 	return &Bot{
-		bot:          bot,
-		dictionaries: dictionaries,
-		messages:     messages,
+		bot:      bot,
+		messages: messages,
+		buttons:  buttons,
 	}
 }
 

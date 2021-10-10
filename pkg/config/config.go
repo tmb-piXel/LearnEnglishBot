@@ -9,19 +9,31 @@ type Messages struct {
 }
 
 type Responses struct {
-	StartMessage        string `mapstructure:"start_message"`
-	AlreadyStart        string `mapstructure:"already_start"`
-	UnknownCommand      string `mapstructure:"unknown_command"`
-	CorrectAnswer       string `mapstructure:"correct_answer"`
-	WrongAnswer         string `mapstructure:"wrong_answer"`
-	TheCorrectAnswerWas string `mapstructure:"the_correct_answer_was"`
-	SelectLanguage      string `mapstructure:"select_language"`
+	StartMessage   string `mapstructure:"start_message"`
+	HelpMessage    string `mapstructure:"help_message"`
+	AlreadyStart   string `mapstructure:"already_start"`
+	UnknownCommand string `mapstructure:"unknown_command"`
+	CorrectAnswer  string `mapstructure:"correct_answer"`
+	WrongAnswer    string `mapstructure:"wrong_answer"`
+	SelectLanguage string `mapstructure:"select_language"`
 }
 
 type Config struct {
-	TelegramToken  string
-	DictionaryFile string `mapstructure:"dictionary_file"`
-	Messages       Messages
+	TelegramToken   string
+	PathDictonaries string `mapstructure:"path_dictionaries"`
+	PostgresqlUrl   string
+	Messages        Messages
+	Buttons         Buttons
+}
+
+type Buttons struct {
+	SetLang  string `mapstructure:"set_lang"`
+	Settings string `mapstructure:"settings"`
+	Help     string `mapstructure:"help"`
+	SetTopic string `mapstructure:"set_topic"`
+	List     string `mapstructure:"list"`
+	FromRu   string `mapstructure:"fromRu"`
+	ToRu     string `mapstructure:"toRu"`
 }
 
 func Init() (*Config, error) {
@@ -41,6 +53,10 @@ func Init() (*Config, error) {
 		return nil, err
 	}
 
+	if err := viper.UnmarshalKey("buttons", &cfg.Buttons); err != nil {
+		return nil, err
+	}
+
 	if err := parseEnv(&cfg); err != nil {
 		return nil, err
 	}
@@ -49,11 +65,12 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	if err := viper.BindEnv("telegramtoken"); err != nil {
+	if err := viper.BindEnv("telegramtoken", "postgresqlurl"); err != nil {
 		return err
 	}
 
 	cfg.TelegramToken = viper.GetString("telegramtoken")
+	cfg.PostgresqlUrl = viper.GetString("postgresqlurl")
 
 	return nil
 }
