@@ -68,6 +68,7 @@ jobs:
               export POSTGRESQLURL=${{ secrets.POSTGRESQLURL}}
               # Run a new container from a new image
               docker run --restart always -idt \
+              --log-driver=loki \
               --log-opt loki-url="http://localhost:3100/loki/api/v1/push" \
               --log-opt loki-retries=5 \
               --log-opt loki-batch-size=400 \
