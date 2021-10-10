@@ -23,7 +23,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Error("Bot did not start error: ", err)
+		log.Panic("Bot did not start error: ", err)
 	}
 
 	log.Println("Bot started")

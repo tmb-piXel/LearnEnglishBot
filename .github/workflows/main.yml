@@ -65,7 +65,7 @@ jobs:
               docker rm $(echo $CONTAINER_NAME)
               # Set env variables
               export TELEGRAMTOKEN=${{ secrets.TELEGRAMTOKEN }}
-              export POSTGRESQLURL=${{ secrets.POSTGRESQLURL}}
+              export POSTGRESQLURL=${{ secrets.POSTGRESQLURL }}
               # Run a new container from a new image
               docker run --restart always -idt \
               --log-driver=loki \
@@ -73,5 +73,5 @@ jobs:
               --log-opt loki-retries=5 \
               --log-opt loki-batch-size=400 \
               --network="host" \
-              --name $(echo $CONTAINER_NAME) -e TELEGRAMTOKEN,POSTGRESQLURL \
+              --name $(echo $CONTAINER_NAME) -e TELEGRAMTOKEN -e POSTGRESQLURL \
               $(echo $REGISTRY)/$(echo $BOT_IMAGE):$(echo $GITHUB_SHA | head -c7)

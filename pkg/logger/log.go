@@ -18,7 +18,6 @@ func init() {
 			filename := path.Base(f.File)
 			return fmt.Sprintf("%s()", f.Function), fmt.Sprintf("%s:%d", filename, f.Line)
 		},
-		PrettyPrint: true,
 	})
 }
 

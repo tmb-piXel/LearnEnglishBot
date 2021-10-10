@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -65,12 +67,19 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	if err := viper.BindEnv("telegramtoken", "postgresqlurl"); err != nil {
+	if err := viper.BindEnv("telegramtoken"); err != nil {
 		return err
 	}
 
 	cfg.TelegramToken = viper.GetString("telegramtoken")
+	fmt.Println(cfg.TelegramToken)
+
+	if err := viper.BindEnv("postgresqlurl"); err != nil {
+		return err
+	}
+
 	cfg.PostgresqlUrl = viper.GetString("postgresqlurl")
+	fmt.Println(cfg.PostgresqlUrl)
 
 	return nil
 }
