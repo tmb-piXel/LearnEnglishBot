@@ -70,9 +70,7 @@ func parseEnv(cfg *Config) error {
 	}
 
 	cfg.TelegramToken = viper.GetString("telegramtoken")
-	cfg.TelegramToken = `1955006608:AAFfX0ca0VBLFs6uwVr9VdLZVHo3t1ikGj0`
 	cfg.PostgresqlUrl = viper.GetString("postgresqlurl")
-	cfg.PostgresqlUrl = `host=localhost port=5433 user=postgres password=postgres dbname=postgres sslmode=disable`
 
 	return nil
 }

@@ -7,7 +7,7 @@ on:
 env:
   REGISTRY: "pixel68tmb"
   BOT_IMAGE: "telegram_bot"
-  CONTAINER_NAME: "telegram_bot"
+  CONTAINER_NAME: "bot"
 
 
 jobs:
@@ -63,10 +63,14 @@ jobs:
               docker stop $(echo $CONTAINER_NAME)
               # Remove old container
               docker rm $(echo $CONTAINER_NAME)
-              # Remove unused images
-              docker image prune -fa
               # Set env variables
               export TELEGRAMTOKEN=${{ secrets.TELEGRAMTOKEN }}
+              export POSTGRESQLURL=${{ secrets.POSTGRESQLURL}}
               # Run a new container from a new image
-              docker run --restart always -idt --name telegram_bot -e TELEGRAMTOKEN \
+              docker run --restart always -idt \
+              --log-opt loki-url="http://localhost:3100/loki/api/v1/push" \
+              --log-opt loki-retries=5 \
+              --log-opt loki-batch-size=400 \
+              --network="host" \
+              --name $(echo $CONTAINER_NAME) -e TELEGRAMTOKEN,POSTGRESQLURL \
               $(echo $REGISTRY)/$(echo $BOT_IMAGE):$(echo $GITHUB_SHA | head -c7)
