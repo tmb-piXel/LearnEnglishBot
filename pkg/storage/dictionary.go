@@ -48,7 +48,7 @@ func readDictionaries(path string) (dictionaries map[string]dictionary) {
 			scanner.Split(bufio.ScanLines)
 			for scanner.Scan() {
 				line := scanner.Text()
-				words := strings.Split(line, "-")
+				words := strings.Split(line, "----")
 				original := string(words[0])
 				translated := string(words[1])
 				topic.originalwords = append(topic.originalwords, original)

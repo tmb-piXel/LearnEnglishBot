@@ -1,6 +1,7 @@
 package telegram
 
 import (
+	"fmt"
 	"strconv"
 
 	log "github.com/tmb-piXel/LearnEnglishBot/pkg/logger"
@@ -46,8 +47,8 @@ func (b *Bot) Handle() {
 
 		var rows []tb.Row
 
-		for _, t := range topicTitles {
-			topicBtn := topicsMarkup[lang].Data(t, lang+t)
+		for i, t := range topicTitles {
+			topicBtn := topicsMarkup[lang].Data(t, lang+fmt.Sprintf("%d", i))
 			topicBtns[lang] = append(topicBtns[lang], topicBtn)
 
 			row := langMarkup.Row(topicBtn)
@@ -122,7 +123,7 @@ func (b *Bot) Handle() {
 			btn := button
 			callback := func(c *tb.Callback) {
 				b.bot.Respond(c, &tb.CallbackResponse{
-					Text: "You have chosen " + btn.Text,
+					Text: "You have chosen topic " + btn.Text,
 				})
 				s.SetTopic(c.Message.Chat.ID, btn.Text)
 				b.bot.Send(c.Message.Chat, s.NewWord(c.Message.Chat.ID), menuMarkup)

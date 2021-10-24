@@ -9,11 +9,10 @@ require (
 )
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/andybalholm/cascadia v1.2.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/jackc/pgx v3.6.2+incompatible // indirect
+	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/lib/pq v1.10.2
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
@@ -23,7 +22,6 @@ require (
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.0
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/tmb-piXel/telegramBotForLearningEnglish v0.0.0-20210503112739-55924c7599a6 // indirect
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
@@ -35,7 +33,11 @@ require (
 )
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/abadojack/whatlanggo v1.0.1 // indirect
+	github.com/chrisport/go-lang-detector v0.0.0-20201227125515-a4270979d85f // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/stretchr/testify v1.7.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
