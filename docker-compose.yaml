@@ -5,6 +5,8 @@ networks:
 
 services: 
     polyglot:
+        env_file:
+          - .env
         container_name: polyglotbot
         image: pixel68tmb/telegram_bot:latest
         build: .
@@ -15,7 +17,7 @@ services:
         image: postgres
         container_name: db
         ports:
-          - 5433:5432
+          - 5432:5432
         volumes:
           - ./initdb.sql:/docker-entrypoint-initdb.d/init.sql
         environment: 

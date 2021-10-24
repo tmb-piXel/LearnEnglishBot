@@ -65,17 +65,25 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	if err := viper.BindEnv("telegramtoken"); err != nil {
-		return err
+	token := "telegramtokendev"
+	psqlurl := "postgresqlurldev"
+
+	prod := true
+
+	if prod {
+		token = "telegramtoken"
+		psqlurl = "postgresqlurl"
 	}
 
-	cfg.TelegramToken = viper.GetString("telegramtoken")
-
-	if err := viper.BindEnv("postgresqlurl"); err != nil {
+	if err := viper.BindEnv(token); err != nil {
 		return err
 	}
+	cfg.TelegramToken = viper.GetString(token)
 
-	cfg.PostgresqlUrl = viper.GetString("postgresqlurl")
+	if err := viper.BindEnv(psqlurl); err != nil {
+		return err
+	}
+	cfg.PostgresqlUrl = viper.GetString(psqlurl)
 
 	return nil
 }
