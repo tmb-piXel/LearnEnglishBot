@@ -65,15 +65,8 @@ func Init() (*Config, error) {
 }
 
 func parseEnv(cfg *Config) error {
-	token := "telegramtokendev"
-	psqlurl := "postgresqlurldev"
-
-	prod := true
-
-	if prod {
-		token = "telegramtoken"
-		psqlurl = "postgresqlurl"
-	}
+	token := "telegramtoken"
+	psqlurl := "postgresqlurl"
 
 	if err := viper.BindEnv(token); err != nil {
 		return err
